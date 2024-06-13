@@ -14,7 +14,7 @@ public class MoviesController(IMovieRepository movieRepository) : ControllerBase
         var movie = request.MapToMovie();
         await movieRepository.CreateAsync(movie);
         var movieResponse = movie.MapToResponse();
-        return Created(ApiEndpoints.Movies.Get.Replace("{id}", movie.Id.ToString()), movieResponse);
+        return CreatedAtAction(nameof(Get), new { id = movie.Id }, movieResponse);
     }
     
     [HttpGet(ApiEndpoints.Movies.Get)]
@@ -36,5 +36,19 @@ public class MoviesController(IMovieRepository movieRepository) : ControllerBase
         var movies = await movieRepository.GetAllAsync();
         var moviesResponse = movies.MapToResponse();
         return Ok(moviesResponse);
+    }
+    
+    [HttpPut(ApiEndpoints.Movies.Update)]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request)
+    {
+        var movie = request.MapToMovie(id);
+        var updated = await movieRepository.UpdateAsync(movie);
+        if (!updated)
+        {
+            return NotFound();
+        }
+
+        var response = movie.MapToResponse();
+        return Ok(response);
     }
 }
