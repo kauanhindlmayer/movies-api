@@ -41,7 +41,7 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         return result > 0;
     }
 
-    public async Task<Movie?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Movie?> GetByIdAsync(Guid id, Guid? userId = default, CancellationToken ct = default)
     {
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         var movie = await connection.QuerySingleOrDefaultAsync<Movie>(
@@ -73,7 +73,7 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         return movie;
     }
 
-    public async Task<Movie?> GetBySlugAsync(string slug, CancellationToken ct = default)
+    public async Task<Movie?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken ct = default)
     {
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         var movie = await connection.QuerySingleOrDefaultAsync<Movie>(new CommandDefinition(
@@ -105,7 +105,7 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         return movie;
     }
 
-    public async Task<IEnumerable<Movie>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = default, CancellationToken ct = default)
     {
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         var result = await connection.QueryAsync(
@@ -127,7 +127,7 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         });
     }
 
-    public async Task<bool> UpdateAsync(Movie movie, CancellationToken ct = default)
+    public async Task<bool> UpdateAsync(Movie movie, Guid? userId = default, CancellationToken ct = default)
     {
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         using var transaction = connection.BeginTransaction();
