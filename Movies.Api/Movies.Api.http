@@ -1,6 +1,44 @@
-@Movies.Api_HostAddress = http://localhost:5061
+@Movies.Api_HostAddress = https://localhost:7181/api
+@id = c2b07781-8435-493d-b207-0d891d824bd0
 
-GET {{Movies.Api_HostAddress}}/weatherforecast/
+### Get All Movies
+GET {{Movies.Api_HostAddress}}/movies
 Accept: application/json
 
-###
+### Get a Movie by ID or Slug
+
+GET {{Movies.Api_HostAddress}}/movies/{{id}}
+Accept: application/json
+
+### Create a New Movie
+POST {{Movies.Api_HostAddress}}/movies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Nick the Greek",
+  "slug": "nick-the-greek-2023",
+  "yearOfRelease": 2023,
+  "genres": [
+    "Comedy"
+  ]
+}
+
+### Update an Existing Movie
+
+PUT {{Movies.Api_HostAddress}}/movies/{{id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Nick the Greek",
+  "slug": "nick-the-greek-2023",
+  "yearOfRelease": 2023,
+  "genres": [
+    "Comedy"
+  ]
+}
+
+### Delete a Movie
+DELETE {{Movies.Api_HostAddress}}/movies/{{id}}
+Accept: application/json
