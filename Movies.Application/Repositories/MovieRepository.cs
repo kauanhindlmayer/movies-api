@@ -47,11 +47,14 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         var movie = await connection.QuerySingleOrDefaultAsync<Movie>(
             new CommandDefinition(
                 """
-                SELECT id, title, slug, yearofrelease
-                FROM movies
-                WHERE id = @Id;
+                SELECT m.*, ROUND(AVG(r.rating), 1) AS rating, myr.rating AS userrating
+                FROM movies m
+                LEFT JOIN ratings r ON m.id = r.movieId
+                LEFT JOIN ratings myr ON m.id = myr.movieId AND myr.userId = @UserId
+                WHERE id = @Id
+                GROUP BY m.id, myr.rating;
                 """,
-                new { Id = id })
+                new { Id = id, UserId = userId })
         );
         if (movie is null)
         {
@@ -78,11 +81,13 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         var movie = await connection.QuerySingleOrDefaultAsync<Movie>(new CommandDefinition(
             """
-            SELECT id, title, slug, yearofrelease
-            FROM movies
+            SELECT m.*, ROUND(AVG(r.rating), 1) AS rating, myr.rating AS userrating
+            FROM movies m
+            LEFT JOIN ratings r ON m.id = r.movieId
+            LEFT JOIN ratings myr ON m.id = myr.movieId AND myr.userId = @UserId
             WHERE slug = @Slug;
             """,
-            new { Slug = slug },
+            new { Slug = slug, UserId = userId },
             cancellationToken: ct)
         );
         if (movie is null)
@@ -110,9 +115,14 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         var result = await connection.QueryAsync(
             new CommandDefinition("""
-                                  SELECT m.*, STRING_AGG(g.name, ', ') AS genres
+                                  SELECT m.*,
+                                         STRING_AGG(DISTINCT g.name, ', ') AS genres,
+                                         ROUND(AVG(r.rating), 1) AS rating,
+                                         myr.rating AS userrating
                                   FROM movies m
                                   LEFT JOIN genres g ON m.id = g.movieId
+                                  LEFT JOIN ratings r ON m.id = r.movieId
+                                  LEFT JOIN ratings myr ON m.id = myr.movieId AND myr.userId = @UserId
                                   GROUP BY m.id;
                                   """,
                 cancellationToken: ct)
@@ -123,11 +133,13 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
             Id = x.id,
             Title = x.title,
             YearOfRelease = x.yearofrelease,
+            Rating = (float?)x.rating,
+            UserRating = (int?)x.userrating,
             Genres = Enumerable.ToList(x.genres.Split(", "))
         });
     }
 
-    public async Task<bool> UpdateAsync(Movie movie, Guid? userId = default, CancellationToken ct = default)
+    public async Task<bool> UpdateAsync(Movie movie, CancellationToken ct = default)
     {
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
         using var transaction = connection.BeginTransaction();

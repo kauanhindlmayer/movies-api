@@ -12,7 +12,7 @@ public interface IMovieRepository
 
     Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = default, CancellationToken ct = default);
 
-    Task<bool> UpdateAsync(Movie movie, Guid? userId = default, CancellationToken ct = default);
+    Task<bool> UpdateAsync(Movie movie, CancellationToken ct = default);
 
     Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
 
