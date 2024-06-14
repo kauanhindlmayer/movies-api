@@ -85,7 +85,8 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
             FROM movies m
             LEFT JOIN ratings r ON m.id = r.movieId
             LEFT JOIN ratings myr ON m.id = myr.movieId AND myr.userId = @UserId
-            WHERE slug = @Slug;
+            WHERE slug = @Slug
+            GROUP BY m.id, myr.rating;
             """,
             new { Slug = slug, UserId = userId },
             cancellationToken: ct)
@@ -123,8 +124,9 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
                                   LEFT JOIN genres g ON m.id = g.movieId
                                   LEFT JOIN ratings r ON m.id = r.movieId
                                   LEFT JOIN ratings myr ON m.id = myr.movieId AND myr.userId = @UserId
-                                  GROUP BY m.id;
+                                  GROUP BY m.id, myr.rating;
                                   """,
+                new { UserId = userId },
                 cancellationToken: ct)
         );
 
