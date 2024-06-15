@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Api.Auth;
 using Movies.Api.Mappings;
@@ -9,6 +10,7 @@ using Movies.Contracts.Responses;
 namespace Movies.Api.Controllers;
 
 [ApiController]
+[ApiVersion(1.0)]
 public class MoviesController(IMovieService movieService) : ControllerBase
 {
     [Authorize(AuthConstants.TrustedUserPolicyName)]
@@ -23,6 +25,25 @@ public class MoviesController(IMovieService movieService) : ControllerBase
 
     [HttpGet(ApiEndpoints.Movies.Get)]
     public async Task<IActionResult> Get([FromRoute] string idOrSlug, [FromServices] LinkGenerator linkGenerator,
+        CancellationToken ct)
+    {
+        var userId = HttpContext.GetUserId();
+        var movie = Guid.TryParse(idOrSlug, out var id)
+            ? await movieService.GetByIdAsync(id, userId, ct)
+            : await movieService.GetBySlugAsync(idOrSlug, userId, ct);
+
+        if (movie is null)
+        {
+            return NotFound();
+        }
+
+        var movieResponse = movie.MapToResponse();
+        return Ok(movieResponse);
+    }
+    
+    [ApiVersion(2.0)]
+    [HttpGet(ApiEndpoints.Movies.Get)]
+    public async Task<IActionResult> GetV2([FromRoute] string idOrSlug, [FromServices] LinkGenerator linkGenerator,
         CancellationToken ct)
     {
         var userId = HttpContext.GetUserId();
