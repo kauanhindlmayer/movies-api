@@ -11,6 +11,7 @@ namespace Movies.Api.Controllers;
 
 [ApiController]
 [ApiVersion(1.0)]
+[ApiVersion(2.0)]
 public class MoviesController(IMovieService movieService) : ControllerBase
 {
     [Authorize(AuthConstants.TrustedUserPolicyName)]
@@ -23,6 +24,7 @@ public class MoviesController(IMovieService movieService) : ControllerBase
         return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movieResponse);
     }
 
+    [MapToApiVersion(1.0)]
     [HttpGet(ApiEndpoints.Movies.Get)]
     public async Task<IActionResult> Get([FromRoute] string idOrSlug, [FromServices] LinkGenerator linkGenerator,
         CancellationToken ct)
@@ -41,7 +43,7 @@ public class MoviesController(IMovieService movieService) : ControllerBase
         return Ok(movieResponse);
     }
     
-    [ApiVersion(2.0)]
+    [MapToApiVersion(2.0)]
     [HttpGet(ApiEndpoints.Movies.Get)]
     public async Task<IActionResult> GetV2([FromRoute] string idOrSlug, [FromServices] LinkGenerator linkGenerator,
         CancellationToken ct)
