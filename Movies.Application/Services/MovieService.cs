@@ -7,7 +7,8 @@ namespace Movies.Application.Services;
 public class MovieService(
     IMovieRepository movieRepository,
     IValidator<Movie> validator,
-    IRatingRepository ratingRepository) : IMovieService
+    IRatingRepository ratingRepository,
+    IValidator<GetAllMoviesOptions> optionsValidator) : IMovieService
 {
     public async Task<bool> CreateAsync(Movie movie, CancellationToken ct = default)
     {
@@ -25,9 +26,10 @@ public class MovieService(
         return movieRepository.GetBySlugAsync(slug, userId, ct);
     }
 
-    public Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = default, CancellationToken ct = default)
+    public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOptions options, CancellationToken ct = default)
     {
-        return movieRepository.GetAllAsync(userId, ct);
+        await optionsValidator.ValidateAndThrowAsync(options, ct);
+        return await movieRepository.GetAllAsync(options, ct);
     }
 
     public async Task<Movie?> UpdateAsync(Movie movie, Guid? userId = default, CancellationToken ct = default)
@@ -40,14 +42,14 @@ public class MovieService(
         }
 
         await movieRepository.UpdateAsync(movie, ct);
-        
+
         if (!userId.HasValue)
         {
             var rating = await ratingRepository.GetRatingAsync(movie.Id, ct);
             movie.Rating = rating;
             return movie;
         }
-        
+
         var ratings = await ratingRepository.GetRatingAsync(movie.Id, userId.Value, ct);
         movie.Rating = ratings.Rating;
         movie.UserRating = ratings.UserRating;
