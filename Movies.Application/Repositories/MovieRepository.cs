@@ -114,8 +114,15 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
     public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOptions options, CancellationToken ct = default)
     {
         using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
+
+        var orderClause = string.Empty;
+        if (options.SortField is not null)
+        {
+            orderClause = $", ORDER BY {options.SortField} {(options.SortOrder == SortOrder.Descending ? "DESC" : "ASC")}";
+        }
+        
         var result = await connection.QueryAsync(
-            new CommandDefinition("""
+            new CommandDefinition($"""
                                   SELECT m.*,
                                          STRING_AGG(DISTINCT g.name, ', ') AS genres,
                                          ROUND(AVG(r.rating), 1) AS rating,
@@ -126,7 +133,7 @@ public class MovieRepository(IDbConnectionFactory dbConnectionFactory) : IMovieR
                                   LEFT JOIN ratings myr ON m.id = myr.movieId AND myr.userId = @UserId
                                   WHERE (@Title IS NULL OR m.title LIKE ('%' || @Title || '%'))
                                   AND (@YearOfRelease IS NULL OR m.yearOfRelease = @YearOfRelease)
-                                  GROUP BY m.id, myr.rating;
+                                  GROUP BY m.id, myr.rating {orderClause}
                                   """,
                 new { options.UserId, options.Title, options.YearOfRelease },
                 cancellationToken: ct)
