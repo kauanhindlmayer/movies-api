@@ -15,4 +15,6 @@ public interface IMovieService
     Task<Movie?> UpdateAsync(Movie movie, Guid? userId = default, CancellationToken ct = default);
 
     Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
+    
+    Task<int> GetCountAsync(string? title, int? yearOfRelease, CancellationToken ct = default);
 }
