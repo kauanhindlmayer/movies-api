@@ -4,6 +4,7 @@ using Movies.Api.Auth;
 using Movies.Api.Mappings;
 using Movies.Application.Services;
 using Movies.Contracts.Requests;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Controllers;
 
@@ -21,7 +22,8 @@ public class MoviesController(IMovieService movieService) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Movies.Get)]
-    public async Task<IActionResult> Get([FromRoute] string idOrSlug, CancellationToken ct)
+    public async Task<IActionResult> Get([FromRoute] string idOrSlug, [FromServices] LinkGenerator linkGenerator,
+        CancellationToken ct)
     {
         var userId = HttpContext.GetUserId();
         var movie = Guid.TryParse(idOrSlug, out var id)
@@ -34,6 +36,14 @@ public class MoviesController(IMovieService movieService) : ControllerBase
         }
 
         var movieResponse = movie.MapToResponse();
+        
+        movieResponse.Links.Add(new Link
+        {
+            Href = linkGenerator.GetPathByAction(HttpContext, nameof(Get), values: new { idOrSlug = movie.Id })!,
+            Rel = "self",
+            Type = "GET"
+        });
+        
         return Ok(movieResponse);
     }
 
