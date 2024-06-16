@@ -55,6 +55,9 @@ public class IdentityController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         var jwt = tokenHandler.WriteToken(token);
-        return Ok(jwt);
+        return Ok(new TokenGenerationResponse
+        {
+            AccessToken = jwt
+        });
     }
 }

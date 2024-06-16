@@ -1,8 +1,4 @@
-using System.Text;
-using Asp.Versioning;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Movies.Api.Auth;
 using Movies.Api.Health;
 using Movies.Api.Mappings;
@@ -14,56 +10,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.TokenValidationParameters = new TokenValidationParameters
-    {
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(config["Jwt:Key"]!)),
-        ValidateIssuerSigningKey = true,
-        ValidateLifetime = true,
-        ValidIssuer = config["Jwt:Issuer"],
-        ValidAudience = config["Jwt:Audience"],
-        ValidateIssuer = true,
-        ValidateAudience = true
-    };
-});
-
-builder.Services.AddAuthorization(x =>
-{
-    // x.AddPolicy(AuthConstants.AdminUserPolicyName, p => p.RequireRole(AuthConstants.AdminUserClaimName));
-
-    x.AddPolicy(AuthConstants.AdminUserPolicyName, p => p.AddRequirements(new AdminAuthRequirement(config["ApiKey"]!)));
-    
-    x.AddPolicy(AuthConstants.TrustedUserPolicyName, p => p.RequireAssertion(c =>
-        c.User.HasClaim(m => m is { Type: AuthConstants.AdminUserClaimName, Value: "true" }) ||
-        c.User.HasClaim(m => m is { Type: AuthConstants.TrustedUserClaimName, Value: "true" })));
-});
-
-builder.Services.AddScoped<ApiKeyAuthFilter>();
-
-builder.Services.AddApiVersioning(x =>
-{
-    x.DefaultApiVersion = new ApiVersion(1.0);
-    x.AssumeDefaultVersionWhenUnspecified = true;
-    x.ReportApiVersions = true;
-    x.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
-}).AddMvc().AddApiExplorer();
-
-// builder.Services.AddResponseCaching();
-builder.Services.AddOutputCache(x =>
-{
-    x.AddBasePolicy(c =>
-    {
-        c.Cache().Expire(TimeSpan.FromMinutes(1))
-            .SetVaryByQuery(["title", "yearOfRelease", "sortBy", "page", "pageSize"]).Tag("movies");
-    });
-});
+builder.AddJwtAuthentication(config);
+builder.AddApiVersioning();
+builder.AddOutputCache();
 
 builder.Services.AddControllers();
 
@@ -84,8 +33,7 @@ if (app.Environment.IsDevelopment())
     {
         foreach (var description in app.DescribeApiVersions())
         {
-            x.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                description.GroupName.ToUpperInvariant());
+            x.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName);
         }
     });
 }
@@ -97,8 +45,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// app.UseCors();
-// app.UseResponseCaching();
 app.UseOutputCache();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
