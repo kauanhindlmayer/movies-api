@@ -15,7 +15,8 @@ namespace Movies.Api.Controllers;
 [ApiVersion(2.0)]
 public class MoviesController(IMovieService movieService, IOutputCacheStore outputCacheStore) : ControllerBase
 {
-    [Authorize(AuthConstants.TrustedUserPolicyName)]
+    // [Authorize(AuthConstants.TrustedUserPolicyName)]
+    [ServiceFilter(typeof(ApiKeyAuthFilter))]
     [HttpPost(ApiEndpoints.Movies.Create)]
     [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
