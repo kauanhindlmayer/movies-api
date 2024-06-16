@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Contracts", "Movies.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.Api", "Identity.Api\Identity.Api.csproj", "{B2C8FEDB-C989-4B10-829C-D02FB57E5372}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movies.Api.Sdk", "Movies.Api.Sdk\Movies.Api.Sdk.csproj", "{48A53CB8-867B-4F6B-A390-4682E5897D69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{B2C8FEDB-C989-4B10-829C-D02FB57E5372}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C8FEDB-C989-4B10-829C-D02FB57E5372}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C8FEDB-C989-4B10-829C-D02FB57E5372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48A53CB8-867B-4F6B-A390-4682E5897D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48A53CB8-867B-4F6B-A390-4682E5897D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48A53CB8-867B-4F6B-A390-4682E5897D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48A53CB8-867B-4F6B-A390-4682E5897D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
