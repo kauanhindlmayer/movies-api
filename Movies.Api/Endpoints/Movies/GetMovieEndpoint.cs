@@ -10,8 +10,8 @@ public static class GetMovieEndpoint
 
     public static IEndpointRouteBuilder MapGetMovie(this IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.Movies.Get,
-            async (string idOrSlug, IMovieService movieService, HttpContext httpContext, CancellationToken ct) =>
+        app.MapGet(ApiEndpoints.Movies.Get, async (
+                string idOrSlug, IMovieService movieService, HttpContext httpContext, CancellationToken ct) =>
             {
                 var userId = httpContext.GetUserId();
                 var movie = Guid.TryParse(idOrSlug, out var id)
@@ -25,7 +25,8 @@ public static class GetMovieEndpoint
 
                 var movieResponse = movie.MapToResponse();
                 return TypedResults.Ok(movieResponse);
-            });
+            })
+            .WithName(Name);
         return app;
     }
 }
