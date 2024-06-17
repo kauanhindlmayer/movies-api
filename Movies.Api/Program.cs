@@ -10,6 +10,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
+// builder.Services.AddScoped<ApiKeyAuthFilter>();
+
 builder.AddJwtAuthentication(config);
 builder.AddApiVersioning();
 builder.AddOutputCache();
