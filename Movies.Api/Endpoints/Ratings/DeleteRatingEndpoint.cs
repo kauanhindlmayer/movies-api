@@ -10,12 +10,15 @@ public static class DeleteRatingEndpoint
     public static IEndpointRouteBuilder MapDeleteRating(this IEndpointRouteBuilder app)
     {
         app.MapDelete(ApiEndpoints.Movies.Create, async (Guid id, IRatingService ratingService,
-            HttpContext httpContext, CancellationToken ct) =>
-        {
-            var userId = httpContext.GetUserId();
-            var result = await ratingService.DeleteRatingAsync(id, userId!.Value, ct);
-            return result ? TypedResults.Ok() : Results.NotFound();
-        });
+                HttpContext httpContext, CancellationToken ct) =>
+            {
+                var userId = httpContext.GetUserId();
+                var result = await ratingService.DeleteRatingAsync(id, userId!.Value, ct);
+                return result ? TypedResults.Ok() : Results.NotFound();
+            })
+            .WithName(Name)
+            .RequireAuthorization();
+        
         return app;
     }
 }

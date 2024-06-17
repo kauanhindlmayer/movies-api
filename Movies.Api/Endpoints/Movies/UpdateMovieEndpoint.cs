@@ -13,21 +13,24 @@ public static class UpdateMovieEndpoint
     public static IEndpointRouteBuilder MapUpdateMovie(this IEndpointRouteBuilder app)
     {
         app.MapPut(ApiEndpoints.Movies.Update, async (
-            Guid id, UpdateMovieRequest request, IMovieService movieService,
-            IOutputCacheStore outputCacheStore, HttpContext httpContext, CancellationToken ct) =>
-        {
-            var userId = httpContext.GetUserId();
-            var movie = request.MapToMovie(id);
-            var updatedMovie = await movieService.UpdateAsync(movie, userId, ct);
-            if (updatedMovie is null)
+                Guid id, UpdateMovieRequest request, IMovieService movieService,
+                IOutputCacheStore outputCacheStore, HttpContext httpContext, CancellationToken ct) =>
             {
-                return Results.NotFound();
-            }
+                var userId = httpContext.GetUserId();
+                var movie = request.MapToMovie(id);
+                var updatedMovie = await movieService.UpdateAsync(movie, userId, ct);
+                if (updatedMovie is null)
+                {
+                    return Results.NotFound();
+                }
 
-            await outputCacheStore.EvictByTagAsync("movies", ct);
-            var response = updatedMovie.MapToResponse();
-            return TypedResults.Ok(response);
-        });
+                await outputCacheStore.EvictByTagAsync("movies", ct);
+                var response = updatedMovie.MapToResponse();
+                return TypedResults.Ok(response);
+            })
+            .WithName(Name)
+            .RequireAuthorization(AuthConstants.TrustedUserPolicyName);
+
         return app;
     }
 }

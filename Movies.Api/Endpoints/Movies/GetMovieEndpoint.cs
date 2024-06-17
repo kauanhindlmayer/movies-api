@@ -27,6 +27,7 @@ public static class GetMovieEndpoint
                 return TypedResults.Ok(movieResponse);
             })
             .WithName(Name);
+
         return app;
     }
 }

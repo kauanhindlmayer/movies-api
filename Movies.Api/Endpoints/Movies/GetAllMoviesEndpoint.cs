@@ -23,6 +23,7 @@ public static class GetAllMoviesEndpoint
                 return TypedResults.Ok(moviesResponse);
             })
             .WithName(Name);
+
         return app;
     }
 }

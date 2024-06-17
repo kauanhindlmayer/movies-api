@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.OutputCaching;
+using Movies.Api.Auth;
 using Movies.Application.Services;
 
 namespace Movies.Api.Endpoints.Movies;
@@ -22,7 +23,9 @@ public static class DeleteMovieEndpoint
                 await outputCacheStore.EvictByTagAsync("movies", ct);
                 return Results.NoContent();
             })
-            .WithName(Name);
+            .WithName(Name)
+            .RequireAuthorization(AuthConstants.AdminUserPolicyName);
+
         return app;
     }
 }
