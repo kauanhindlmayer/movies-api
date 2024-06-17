@@ -29,6 +29,8 @@ builder.Services.AddDatabase(config["Database:ConnectionString"]!);
 
 var app = builder.Build();
 
+app.CreateApiVersionSet();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

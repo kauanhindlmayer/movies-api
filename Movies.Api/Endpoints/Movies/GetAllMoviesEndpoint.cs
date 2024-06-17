@@ -25,7 +25,10 @@ public static class GetAllMoviesEndpoint
             })
             .WithName(Name)
             .WithTags(Tags.Movies)
-            .Produces<MoviesResponse>();
+            .Produces<MoviesResponse>()
+            .WithApiVersionSet(ApiVersioning.VersionSet)
+            .HasApiVersion(1.0)
+            .CacheOutput("MovieCache");
 
         return app;
     }
