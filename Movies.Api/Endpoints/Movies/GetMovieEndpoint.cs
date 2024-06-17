@@ -1,6 +1,7 @@
 ﻿using Movies.Api.Auth;
 using Movies.Api.Mappings;
 using Movies.Application.Services;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
@@ -26,7 +27,10 @@ public static class GetMovieEndpoint
                 var movieResponse = movie.MapToResponse();
                 return TypedResults.Ok(movieResponse);
             })
-            .WithName(Name);
+            .WithName(Name)
+            .WithTags(Tags.Movies)
+            .Produces<MovieResponse>()
+            .Produces(StatusCodes.Status404NotFound);
 
         return app;
     }

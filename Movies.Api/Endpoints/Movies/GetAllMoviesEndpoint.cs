@@ -2,12 +2,13 @@
 using Movies.Api.Mappings;
 using Movies.Application.Services;
 using Movies.Contracts.Requests;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
 public static class GetAllMoviesEndpoint
 {
-    public const string Name = "GetAllMovies";
+    private const string Name = "GetAllMovies";
 
     public static IEndpointRouteBuilder MapGetAllMovies(this IEndpointRouteBuilder app)
     {
@@ -22,7 +23,9 @@ public static class GetAllMoviesEndpoint
                 var moviesResponse = movies.MapToResponse(options.Page, options.PageSize, moviesCount);
                 return TypedResults.Ok(moviesResponse);
             })
-            .WithName(Name);
+            .WithName(Name)
+            .WithTags(Tags.Movies)
+            .Produces<MoviesResponse>();
 
         return app;
     }

@@ -47,7 +47,9 @@ public static class BuilderExtensions
             x.AssumeDefaultVersionWhenUnspecified = true;
             x.ReportApiVersions = true;
             x.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
-        }).AddMvc().AddApiExplorer();
+        }).AddApiExplorer();
+
+        builder.Services.AddEndpointsApiExplorer();
     }
 
     public static void AddOutputCache(this WebApplicationBuilder builder)

@@ -3,12 +3,13 @@ using Movies.Api.Auth;
 using Movies.Api.Mappings;
 using Movies.Application.Services;
 using Movies.Contracts.Requests;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
 public static class UpdateMovieEndpoint
 {
-    public const string Name = "UpdateMovie";
+    private const string Name = "UpdateMovie";
 
     public static IEndpointRouteBuilder MapUpdateMovie(this IEndpointRouteBuilder app)
     {
@@ -29,6 +30,10 @@ public static class UpdateMovieEndpoint
                 return TypedResults.Ok(response);
             })
             .WithName(Name)
+            .WithTags(Tags.Movies)
+            .Produces<MovieResponse>()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
             .RequireAuthorization(AuthConstants.TrustedUserPolicyName);
 
         return app;
